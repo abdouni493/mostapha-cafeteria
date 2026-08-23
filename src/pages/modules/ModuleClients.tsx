@@ -257,8 +257,8 @@ export default function ModuleClients({ moduleKey }: { moduleKey: ModuleKey }) {
 
       {filtered.length === 0 ? <EmptyState icon={Users} title="Aucun client" action={perm.creer ? <button className="btn-primary" onClick={() => setShowForm(true)}><Plus className="w-4 h-4" /> Nouveau client</button> : undefined} /> : (
         /* ── Les cartes clients ───────────────────────────────────
-           Même dessin que l’écran Clients du Carburant : un client est un client,
-           qu’il prenne du gasoil, un café ou un lavage, et rien ne justifiait
+           Un client est un client : sa fiche se lit de la même façon
+           qu'il prenne un café ou une commande de cent viennoiseries, et rien ne justifiait
            qu’on doive réapprendre à lire sa fiche en changeant d’activité.
            Les trois chiffres se relisent l’un l’autre : consommé − réglé = reste. */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -23,11 +23,19 @@ import { money, Modal, Table, Badge } from '@/src/components/biz/Kit';
 import ChartBox from '@/src/components/ChartBox';
 import AnalyticsView, { ProductAnalyticsModal } from '@/src/components/biz/AnalyticsView';
 import { PartAnalytics, ProductAnalytics, Granularity, GRANULARITY_LABEL } from '@/src/lib/bizAnalytics';
+import { getModuleConfig } from '@/src/lib/bizConfig';
 
-const PART_COLOR: Record<string, string> = {
-  carburant: '#003087', cafeteria: '#d97706', lavage: '#0e9f6e', global: '#7c3aed',
-};
-const AXIS = { fontSize: 11, fill: '#94a3b8' } as const;
+/**
+ * La teinte d'une courbe.
+ *
+ * Elle vient de la CAFETERIA elle-meme : celle qu'on lui a choisie dans les
+ * Reglages, la meme que dans le menu, les filtres et le tableau de bord. Une
+ * table de couleurs figee ici aurait donne une courbe verte a une cafeteria
+ * affichee en brun partout ailleurs.
+ */
+const colorOf = (key: string): string =>
+  (key === 'global' ? '#4B3621' : getModuleConfig(key).color) || '#6F4E37';
+const AXIS = { fontSize: 11, fill: '#A39588' } as const;
 const shortMoney = (n: number): string => {
   const abs = Math.abs(n);
   if (abs >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -41,7 +49,7 @@ const TIP = {
 
 /** Carte d'une activité : ses chiffres et sa courbe, cliquable. */
 function PartCard({ part, onOpen }: { part: PartAnalytics; onOpen: () => void; key?: React.Key }) {
-  const color = PART_COLOR[part.key] || '#003087';
+  const color = colorOf(part.key);
   const up = part.trendPct >= 0;
   return (
     <button onClick={onOpen}
@@ -168,7 +176,7 @@ export default function GlobalAnalyticsView({ parts, global, onGranularity }: {
   const shareData = parts.map(p => ({
     name: `${p.emoji} ${p.label}`,
     value: Math.max(0, p.totals.sales),
-    fill: PART_COLOR[p.key] || '#003087',
+    fill: colorOf(p.key),
   }));
 
   return (
@@ -261,7 +269,7 @@ export default function GlobalAnalyticsView({ parts, global, onGranularity }: {
                 <Tooltip {...TIP} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
                 {parts.map(p => (
-                  <Bar key={p.key} dataKey={p.label} stackId="a" fill={PART_COLOR[p.key] || '#64748b'} maxBarSize={30} />
+                  <Bar key={p.key} dataKey={p.label} stackId="a" fill={colorOf(p.key)} maxBarSize={30} />
                 ))}
               </BarChart>
             </ChartBox>

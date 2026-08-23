@@ -262,7 +262,7 @@ export default function ModulePOS({ moduleKey }: { moduleKey: ModuleKey }) {
   // Ce que le client lit sur le second écran. Il suit le panier ligne à ligne :
   // dès qu'un produit y entre, le total change sous ses yeux.
   const displayData = useMemo<CustomerDisplayState>(() => ({
-    title: stationFromSettings(settings).name || 'Station',
+    title: stationFromSettings(settings).name || 'Altech Cafétéria',
     subtitle: cfg.label,
     lines: cart.map(l => ({
       id: l.id, name: l.name, qty: l.qty, unitPrice: l.unitPrice,

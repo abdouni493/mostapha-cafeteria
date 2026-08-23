@@ -23,7 +23,7 @@
  */
 import { BizProduct, ModuleKey } from './bizConfig';
 
-const STORAGE_KEY = 'stationpro_product_drafts_v1';
+const STORAGE_KEY = 'altech_cafeteria_product_drafts_v1';
 
 export type DraftStatus = 'pending' | 'failed' | 'lost' | 'synced';
 

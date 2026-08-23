@@ -1,5 +1,5 @@
 /**
- * ─── Sauvegarde COMPLÈTE de la station ─────────────────────────────────────────
+ * ─── Sauvegarde COMPLÈTE de l'enseigne ─────────────────────────────────────────
  *
  *  CE QUE L'ANCIENNE SAUVEGARDE NE FAISAIT PAS
  *  Le bouton « Exporter .JSON » sérialisait l'état React d'`AppContext`. Trois
@@ -83,7 +83,7 @@ export interface BackupTableReport {
 }
 
 export interface BackupBundle {
-  format: 'stationpro-backup';
+  format: 'altech-cafeteria-backup';
   /** 1 = ancien export de l'état React. 2 = sauvegarde complète lue en base. */
   version: 2;
   createdAt: string;
@@ -96,11 +96,11 @@ export interface BackupBundle {
 
 /** Une sauvegarde version 1 (ancien format) reste lisible : on sait la détecter. */
 export function isLegacyBundle(raw: any): boolean {
-  return !!raw && typeof raw === 'object' && raw.format !== 'stationpro-backup';
+  return !!raw && typeof raw === 'object' && raw.format !== 'altech-cafeteria-backup';
 }
 
 export function isBackupBundle(raw: any): raw is BackupBundle {
-  return !!raw && raw.format === 'stationpro-backup' && !!raw.tables && typeof raw.tables === 'object';
+  return !!raw && raw.format === 'altech-cafeteria-backup' && !!raw.tables && typeof raw.tables === 'object';
 }
 
 // ─── Lecture ───────────────────────────────────────────────────────────────────
@@ -178,7 +178,7 @@ export async function createFullBackup(
   onProgress?.('Terminé', BACKUP_TABLES.length, BACKUP_TABLES.length);
 
   return {
-    format: 'stationpro-backup',
+    format: 'altech-cafeteria-backup',
     version: 2,
     createdAt: new Date().toISOString(),
     stationName,
@@ -226,7 +226,7 @@ export function bundleToSql(bundle: BackupBundle): string {
 
   out.push('-- ═══════════════════════════════════════════════════════════════════');
   out.push('--  SAUVEGARDE STATIONPRO');
-  out.push(`--  Station : ${bundle.stationName || '(sans nom)'}`);
+  out.push(`--  Enseigne : ${bundle.stationName || '(sans nom)'}`);
   out.push(`--  Date    : ${stamp}`);
   out.push(`--  Contenu : ${bundle.totals.tables} tables, ${bundle.totals.rows} lignes`);
   out.push('--');
@@ -503,7 +503,7 @@ export function backupFilename(ext: 'json' | 'sql', stationName?: string): strin
   const slug = (stationName || 'station')
     .normalize('NFD').replace(/[^\x20-\x7e]/g, '').toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'station';
-  return `stationpro_${slug}_${fileStamp()}.${ext}`;
+  return `altech-cafeteria_${slug}_${fileStamp()}.${ext}`;
 }
 
 // ─── Reprise d'une sauvegarde de l'ANCIEN format ───────────────────────────────

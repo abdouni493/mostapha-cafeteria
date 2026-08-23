@@ -42,7 +42,7 @@ const features = [
 ];
 
 const Login = ({ onLogin }: LoginProps) => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { settings } = useAppState();
   const brand   = settings?.name?.trim() || 'Altech Cafétéria';
   const logo    = settings?.logoUrl || settings?.logo || null;

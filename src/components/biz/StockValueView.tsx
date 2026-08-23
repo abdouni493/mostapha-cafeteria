@@ -309,7 +309,8 @@ export default function StockValueView({ valuation: v }: { valuation: StockValua
       </div>
 
       <p className="text-[11px] text-slate-400 italic">
-        Le carburant en cuve est valorisé au prix d'achat et au prix à la pompe enregistrés dans les Réglages.
+        Le comptoir est valorisé au COÛT DE REVIENT de ses productions, jamais à leur prix affiché :
+        une viennoiserie invendue vaut ce qu'elle a coûté à fabriquer, pas ce qu'on espérait en tirer.
         Les matières premières n'ont pas de prix de vente : leur valeur de vente est égale à leur coût, pour ne pas
         inventer une marge qui n'existe pas.
       </p>

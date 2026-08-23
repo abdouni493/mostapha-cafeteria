@@ -39,7 +39,7 @@ const IFACE_LABEL: Record<string, string> =
   Object.fromEntries(MODULE_INTERFACES.map(i => [i.id, i.label]));
 
 const Navbar = ({ onMenuToggle, sidebarOpen, activePath }: NavbarProps) => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isRtl = i18n.dir() === "rtl";
   const navigate = useNavigate();
 
