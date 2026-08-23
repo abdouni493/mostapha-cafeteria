@@ -166,11 +166,30 @@ sur son identifiant, et ce qui a été créé depuis reste en place.
 ## Scripts
 
 ```bash
-npm run dev     # développement (http://localhost:3000)
-npm run build   # build de production
-npm run start   # sert le build
-npm run lint    # vérification TypeScript
+npm run dev            # développement (http://localhost:3000)
+npm run build          # build du site — c'est ce que lance l'hébergeur
+npm run lint           # vérification TypeScript
+
+npm run build:server   # auto-hébergement : le site + un petit serveur Express
+npm start              # sert ce build (http://localhost:3000)
+npm run clean          # efface dist/ et le serveur bundlé
 ```
+
+### Déploiement
+
+L'application est un site **statique** : `npm run build` produit `dist/`, et
+n'importe quel hébergeur statique la sert (Vercel, Netlify, un simple Nginx).
+Il n'y a aucune fonction serveur — tout passe par Supabase.
+
+Sur **Vercel**, `vercel.json` fait le nécessaire : sortie `dist/`, réécriture
+de toutes les routes vers `index.html` (l'application est une SPA, c'est le
+navigateur qui décide de la page) et cache long sur les fichiers versionnés.
+
+Les identifiants Supabase sont **codés en repli** dans `src/lib/supabase.ts` :
+le déploiement fonctionne même sans variables d'environnement. Pour pointer
+vers un autre projet, définissez `VITE_SUPABASE_URL` et
+`VITE_SUPABASE_ANON_KEY` chez l'hébergeur — elles sont lues **au build**, il
+faut donc redéployer après les avoir changées.
 
 ## Pile technique
 

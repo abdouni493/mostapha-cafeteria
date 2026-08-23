@@ -1,6 +1,9 @@
 node_modules/
 build/
 dist/
+# Le serveur Express bundle par `npm run build:server` (auto-hebergement).
+server.cjs
+server.cjs.map
 coverage/
 .DS_Store
 *.log
