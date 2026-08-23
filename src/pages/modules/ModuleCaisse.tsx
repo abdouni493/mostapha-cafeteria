@@ -110,7 +110,7 @@ export default function ModuleCaisse({ moduleKey }: { moduleKey: ModuleKey }) {
   const del = () => { if (toDelete) { biz.remove('caisse', toDelete.id); toast.success('Transaction supprimée'); setToDelete(null); } };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={Wallet} title="Caisse" subtitle={`${cfg.label} — trésorerie, mouvements & sessions de travail`}
         actions={perm.creer ? <button className="btn-primary" onClick={() => setForm('new')}><Plus className="w-4 h-4" /> Dépôt / Retrait</button> : undefined} />
 

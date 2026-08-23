@@ -7,12 +7,14 @@
  */
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "motion/react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import CommandPalette from "./CommandPalette";
 import { useAppState } from "../store/AppContext";
 import { useCafeterias } from "../store/BizContext";
 import { routeBaseOf } from "../lib/bizConfig";
+import { useMotionPrefs } from "../lib/motion";
 
 /** Clé du réglage « barre latérale masquée » sur poste fixe. */
 const SIDEBAR_HIDDEN_KEY = "altech.sidebarHidden";
@@ -29,6 +31,7 @@ const Layout = ({
   const navigate = useNavigate();
   const { currentUserRole, currentUserId, currentModuleWorker } = useAppState();
   const cafeterias = useCafeterias();
+  const m = useMotionPrefs();
 
   // Sur poste fixe, masquer la barre latérale réduit sa colonne à zéro. Le
   // choix est mémorisé : quelqu'un qui travaille en pleine largeur s'attend à
@@ -152,7 +155,33 @@ const Layout = ({
           sidebarOpen={isDesktop ? !sidebarHidden : sidebarOpen}
           activePath={location.pathname}
         />
-        <main className="flex-1 p-4 lg:p-6 overflow-auto custom-scrollbar">{children}</main>
+        {/* ─── LA TRANSITION D'ÉCRAN ────────────────────────────────────
+            `mode="wait"` fait SORTIR l'écran quitté avant de faire entrer le
+            suivant. Sans lui, les deux se superposent une fraction de seconde
+            et l'on voit deux tableaux de bord l'un sur l'autre.
+
+            La clé est le CHEMIN : c'est ce qui dit à React qu'il s'agit d'un
+            écran différent, et non du même qui aurait changé de contenu.
+            Rester sur le même écran en changeant un filtre ne rejoue donc
+            aucune animation.
+
+            `overflow-auto` reste sur le <main> et non sur l'élément animé :
+            une transformation sur un conteneur défilant ferait sauter la barre
+            de défilement au début de chaque navigation. */}
+        <main className="flex-1 overflow-auto custom-scrollbar">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={location.pathname}
+              variants={m.page}
+              initial="hidden"
+              animate="show"
+              exit="out"
+              className="p-4 lg:p-6"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
       </div>
 
       {/* Recherche rapide — montée ici pour être disponible partout. */}

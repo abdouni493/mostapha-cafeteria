@@ -284,7 +284,7 @@ export default function ModuleStock({ moduleKey }: { moduleKey: ModuleKey }) {
   const negative = (p: BizProduct) => p.currentQty < 0;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={Package} title="Gestion de stock"
         subtitle={allCafeterias ? 'Toutes les cafétérias — lecture seule' : `${cfg.label} — catalogue & inventaire`}
         actions={perm.creer && !allCafeterias

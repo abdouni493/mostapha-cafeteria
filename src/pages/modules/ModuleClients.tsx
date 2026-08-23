@@ -202,7 +202,7 @@ export default function ModuleClients({ moduleKey }: { moduleKey: ModuleKey }) {
   }, [clients, statements]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={Users} title="Clients" subtitle={`${cfg.label} — base clients`}
         actions={perm.creer ? <button className="btn-primary" onClick={() => { setEditing(null); setShowForm(true); }}><Plus className="w-4 h-4" /> Nouveau client</button> : undefined} />
 

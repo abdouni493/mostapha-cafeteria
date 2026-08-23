@@ -21,12 +21,14 @@
  * ──────────────────────────────────────────────────────────────────────────────
  */
 import React from 'react';
+import { motion } from 'motion/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Layers, Coffee } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useAppState } from '@/src/store/AppContext';
 import { useActiveCafeterias } from '@/src/store/BizContext';
 import { ModuleKey, routeBaseOf } from '@/src/lib/bizConfig';
+import { useMotionPrefs } from '@/src/lib/motion';
 
 interface Props {
   /** La cafétéria actuellement ouverte. */
@@ -43,6 +45,7 @@ export default function CafeteriaSwitcher({ current, compare }: Props) {
   const location = useLocation();
   const cafeterias = useActiveCafeterias();
   const { currentUserRole } = useAppState();
+  const m = useMotionPrefs();
 
   // Un employé n'a qu'une cafétéria ; une enseigne à comptoir unique n'a rien à
   // basculer. Dans les deux cas, la barre serait du bruit.
@@ -64,25 +67,27 @@ export default function CafeteriaSwitcher({ current, compare }: Props) {
       </span>
 
       {compare && (
-        <button
+        <motion.button
           onClick={() => compare.onChange(!compare.active)}
+          {...m.pressSubtle}
           className={cn('px-3 py-1.5 rounded-lg text-[12px] font-bold transition border',
             compare.active ? 'bg-[#4B3621] text-white border-[#4B3621]'
               : 'bg-white text-[#7A6A5C] border-[#E2D3C4] hover:border-[#D4A373]')}>
           🏢 {compare.label || 'Toutes les cafétérias'}
-        </button>
+        </motion.button>
       )}
 
       {cafeterias.map(c => {
         const on = !compare?.active && c.id === current;
         return (
-          <button key={c.id} onClick={() => go(c.id)}
+          <motion.button key={c.id} onClick={() => go(c.id)}
+            {...m.pressSubtle}
             className={cn('px-3 py-1.5 rounded-lg text-[12px] font-bold transition border',
               on ? 'text-white border-transparent shadow'
                 : 'bg-white text-[#7A6A5C] border-[#E2D3C4] hover:border-[#D4A373]')}
             style={on ? { background: c.color || '#6F4E37' } : undefined}>
             {c.emoji || '☕'} {c.name}
-          </button>
+          </motion.button>
         );
       })}
     </div>

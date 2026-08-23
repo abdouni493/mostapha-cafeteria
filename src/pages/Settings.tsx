@@ -33,7 +33,7 @@ import {
   downloadText, fileStamp, BackupBundle, RestoreOutcome,
 } from '@/src/lib/backup';
 import {
-  PageHeader, Tabs, Field, Input, Textarea, Select, Modal, Confirm, Badge,
+  PageHeader, Tabs, TabPanel, Field, Input, Textarea, Select, Modal, Confirm, Badge,
   money, formatDate,
 } from '@/src/components/biz/Kit';
 
@@ -43,7 +43,7 @@ export default function Settings() {
   const [tab, setTab] = useState<Tab>('enseigne');
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={Store} title="Réglages" subtitle="Enseigne, cafétérias, compte et base de données" />
 
       <Tabs
@@ -57,10 +57,14 @@ export default function Settings() {
         ]}
       />
 
-      {tab === 'enseigne' && <StoreTab />}
-      {tab === 'cafeterias' && <CafeteriasTab />}
-      {tab === 'compte' && <AccountTab />}
-      {tab === 'base' && <DatabaseTab />}
+      {/* Le panneau glisse d'un onglet a l'autre : le sens du mouvement dit
+          qu'on a change de vue, pas que la page a recharge. */}
+      <TabPanel tabKey={tab}>
+        {tab === 'enseigne' && <StoreTab />}
+        {tab === 'cafeterias' && <CafeteriasTab />}
+        {tab === 'compte' && <AccountTab />}
+        {tab === 'base' && <DatabaseTab />}
+      </TabPanel>
     </div>
   );
 }

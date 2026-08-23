@@ -67,7 +67,7 @@ export default function ModuleWorkers({ moduleKey }: { moduleKey: ModuleKey }) {
   const withAccount = workers.filter(w => w.hasAccount && w.authUserId).length;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={UsersRound} title="Employés" subtitle={`${cfg.label} — personnel`}
         actions={perm.creer
           ? <button className="btn-primary" onClick={() => setForm('new')}><Plus className="w-4 h-4" /> Nouvel employé</button>

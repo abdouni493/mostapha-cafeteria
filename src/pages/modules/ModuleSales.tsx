@@ -136,7 +136,7 @@ export default function ModuleSales({ moduleKey }: { moduleKey: ModuleKey }) {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={Receipt} title="Ventes"
         subtitle={allCafeterias ? 'Toutes les cafétérias — lecture seule' : `${cfg.label} — factures de vente`} />
 

@@ -79,7 +79,7 @@ export default function ModulePurchases({ moduleKey }: { moduleKey: ModuleKey })
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={ShoppingCart} title="Achats" subtitle={`${cfg.label} — factures fournisseurs`}
         actions={perm.creer ? <button className="btn-primary" onClick={() => { setEditing(null); setShowForm(true); }}><Plus className="w-4 h-4" /> Nouvel achat</button> : undefined} />
 

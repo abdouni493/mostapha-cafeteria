@@ -134,7 +134,7 @@ export default function ModuleInventaire({ moduleKey }: { moduleKey: ModuleKey }
   const printComparison = (inv: BizInventaire) => setPrinting({ inv, kind: 'comparison' });
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={ClipboardList} title="Inventaire" subtitle={`${cfg.label} — comptage physique & écarts`}
         actions={perm.creer
           ? <button className="btn-primary" onClick={() => setWizard({ editing: null })}>

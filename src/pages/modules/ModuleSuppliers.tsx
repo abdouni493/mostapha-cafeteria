@@ -36,7 +36,7 @@ export default function ModuleSuppliers({ moduleKey }: { moduleKey: ModuleKey })
   const totalDebt = suppliers.reduce((s, sup) => s + supStats(sup.id).rest, 0);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={Truck} title="Fournisseurs" subtitle={`${cfg.label} — gestion des fournisseurs`}
         actions={perm.creer ? <button className="btn-primary" onClick={() => { setEditing(null); setShowForm(true); }}><Plus className="w-4 h-4" /> Nouveau fournisseur</button> : undefined} />
 

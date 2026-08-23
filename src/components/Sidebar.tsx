@@ -20,10 +20,11 @@ import {
   Vault, FileSpreadsheet, Store, Search, AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/src/lib/utils";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import { useAppState, AppUserRole, ModuleWorkerSession } from "../store/AppContext";
 import { useBizAll, useCafeterias } from "../store/BizContext";
 import { MODULE_INTERFACES, routeBaseOf, ModuleKey, Cafeteria } from "../lib/bizConfig";
+import { useMotionPrefs } from "../lib/motion";
 
 // ─── Icône de chaque interface ────────────────────────────────────────────────
 /**
@@ -73,6 +74,15 @@ export default function Sidebar({
 }: SidebarProps) {
   const { settings, currentUserName, currentUserAvatarUrl } = useAppState();
   const cafeterias = useCafeterias();
+  const m = useMotionPrefs();
+  /**
+   * `Layout` monte DEUX barres latérales : la colonne du poste fixe et le
+   * tiroir mobile. Un `layoutId` en dur ferait de leurs deux pastilles une
+   * seule aux yeux de Motion, qui l'animerait de l'une à l'autre — sur une
+   * tablette, où les deux existent, la pastille traverserait l'écran à chaque
+   * navigation. Chaque instance a donc la sienne.
+   */
+  const pillId = React.useId();
   const biz = useBizAll();
   const isAdmin = userRole !== 'module_worker';
 
@@ -148,7 +158,7 @@ export default function Sidebar({
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            variants={m.backdrop} initial="hidden" animate="show" exit="out"
             onClick={onClose}
             className="fixed inset-0 bg-[#1C110B]/60 backdrop-blur-sm z-40 lg:hidden"
           />
@@ -202,16 +212,20 @@ export default function Sidebar({
         </div>
 
         {/* ── Navigation ──────────────────────────────────────────────── */}
+        {/* `LayoutGroup` : la pastille active glisse aussi ENTRE deux
+            sections (du tableau de bord vers un écran de cafétéria), pas
+            seulement à l'intérieur de l'une d'elles. */}
+        <LayoutGroup>
         <nav className="flex-1 overflow-y-auto custom-scrollbar px-3 py-4 space-y-5">
           {/* Vue d'ensemble — l'administrateur seul la voit. */}
           {isAdmin && (
             <Section title="Vue d'ensemble">
               <Item icon={LayoutDashboard} label="Tableau de bord" path="/dashboard"
-                active={activePath === '/dashboard'} onClick={go} q={q} />
+                active={activePath === '/dashboard'} onClick={go} q={q} pillId={pillId} />
               <Item icon={Vault} label="Caisse générale" path="/general-cash"
-                active={activePath === '/general-cash'} onClick={go} q={q} />
+                active={activePath === '/general-cash'} onClick={go} q={q} pillId={pillId} />
               <Item icon={FileSpreadsheet} label="Rapports généraux" path="/general-reports"
-                active={activePath === '/general-reports'} onClick={go} q={q} />
+                active={activePath === '/general-reports'} onClick={go} q={q} pillId={pillId} />
             </Section>
           )}
 
@@ -225,8 +239,9 @@ export default function Sidebar({
 
             return (
               <div key={caf.id}>
-                <button
+                <motion.button
                   onClick={() => setOpen(o => ({ ...o, [caf.id]: !o[caf.id] }))}
+                  whileTap={m.reduce ? undefined : { scale: 0.985 }}
                   className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-white/[0.06] transition group"
                 >
                   <span
@@ -248,22 +263,31 @@ export default function Sidebar({
                       <AlertTriangle size={9} />{alerts}
                     </span>
                   )}
-                  <ChevronDown
-                    size={14}
-                    className={cn("text-white/40 transition-transform flex-shrink-0", isOpenSec && "rotate-180")}
-                  />
-                </button>
+                  {/* Le chevron tourne AVEC la section, pas avant ni après :
+                      c'est ce qui le fait lire comme la poignée du panneau. */}
+                  <motion.span
+                    animate={{ rotate: isOpenSec ? 180 : 0 }}
+                    transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex-shrink-0 text-white/40"
+                  >
+                    <ChevronDown size={14} />
+                  </motion.span>
+                </motion.button>
 
+                {/* ─── LE DÉPLIAGE ────────────────────────────────────────
+                    La section s'ouvre en hauteur, puis ses écrans arrivent EN
+                    CASCADE (`menuList` / `menuItem`). Le décalage est minuscule
+                    — 28 ms — mais c'est lui qui donne le sens de lecture : on
+                    voit la liste se remplir de haut en bas au lieu d'apparaître
+                    d'un bloc, et l'œil sait où recommencer à lire. */}
                 <AnimatePresence initial={false}>
                   {isOpenSec && (
                     <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
+                      variants={m.collapse} initial="hidden" animate="show" exit="out"
                       className="overflow-hidden"
                     >
-                      <div
+                      <motion.div
+                        variants={m.menuList} initial="hidden" animate="show"
                         className="mt-1 ml-3.5 pl-3 space-y-0.5 border-l"
                         style={{ borderColor: `${caf.color || '#6F4E37'}55` }}
                       >
@@ -279,10 +303,12 @@ export default function Sidebar({
                               onClick={go}
                               q={q}
                               accent={caf.color}
+                              variants={m.menuItem}
+                              pillId={pillId}
                             />
                           );
                         })}
-                      </div>
+                      </motion.div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -293,15 +319,16 @@ export default function Sidebar({
           {isAdmin && (
             <Section title="Application">
               <Item icon={Store} label="Réglages" path="/settings"
-                active={activePath === '/settings'} onClick={go} q={q} />
+                active={activePath === '/settings'} onClick={go} q={q} pillId={pillId} />
             </Section>
           )}
 
           <Section title="Mon compte">
             <Item icon={UserCircle} label="Mon profil" path="/my-settings"
-              active={activePath === '/my-settings'} onClick={go} q={q} />
+              active={activePath === '/my-settings'} onClick={go} q={q} pillId={pillId} />
           </Section>
         </nav>
+        </LayoutGroup>
 
         {/* ── Pied : qui est connecté ─────────────────────────────────── */}
         <div className="px-3 py-3 border-t border-[#D4A373]/12 flex-shrink-0">
@@ -324,13 +351,14 @@ export default function Sidebar({
               </span>
             </div>
             {onLogout && (
-              <button
+              <motion.button
                 onClick={onLogout}
                 title="Déconnexion"
+                {...m.press}
                 className="p-2 rounded-lg text-white/50 hover:text-red-300 hover:bg-red-500/15 transition"
               >
                 <LogOut size={16} />
-              </button>
+              </motion.button>
             )}
           </div>
         </div>
@@ -359,7 +387,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
  * afficherait des écrans sans rapport avec ce qui est tapé.
  */
 function Item({
-  icon: Icon, label, path, active, onClick, q, accent,
+  icon: Icon, label, path, active, onClick, q, accent, variants, pillId,
 }: {
   icon: React.ElementType;
   label: string;
@@ -368,16 +396,48 @@ function Item({
   onClick: (p: string) => void;
   q?: string;
   accent?: string;
+  variants?: any;
+  /** Propre à CETTE barre latérale — voir `pillId` dans `Sidebar`. */
+  pillId: string;
 }) {
+  const m = useMotionPrefs();
   if (q && !label.toLowerCase().includes(q)) return null;
+
+  /**
+   * ─── LA PASTILLE QUI SUIT ────────────────────────────────────────────────
+   * Le fond de l'entrée active n'est pas peint sur le bouton : c'est UN SEUL
+   * élément (`layoutId`) que Motion déplace d'une entrée à l'autre. On voit
+   * donc la sélection GLISSER vers l'écran qu'on vient d'ouvrir, au lieu de
+   * s'éteindre ici et de se rallumer là-bas.
+   *
+   * C'est ce détail qui relie visuellement le clic et le changement de page :
+   * la barre latérale explique la transition au lieu de la subir.
+   */
   return (
-    <button
+    <motion.button
+      variants={variants}
       onClick={() => onClick(path)}
-      className={cn("sidebar-link", active ? "sidebar-link-active" : "sidebar-link-inactive")}
-      style={active && accent ? { background: `linear-gradient(135deg, ${accent}, ${accent}cc)`, color: '#fff' } : undefined}
+      whileTap={m.reduce ? undefined : { scale: 0.97 }}
+      whileHover={m.reduce || active ? undefined : { x: 3 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      className={cn("sidebar-link relative", active ? "sidebar-link-active" : "sidebar-link-inactive")}
+      style={active ? { background: 'transparent', boxShadow: 'none' } : undefined}
     >
-      <Icon size={17} strokeWidth={active ? 2.5 : 2} className="flex-shrink-0" />
-      <span className="truncate">{label}</span>
-    </button>
+      {active && (
+        <motion.span
+          layoutId={pillId}
+          transition={{ type: 'spring', stiffness: 480, damping: 36 }}
+          className="absolute inset-0 rounded-[0.8rem] -z-10"
+          style={{
+            background: accent
+              ? `linear-gradient(135deg, ${accent}, ${accent}cc)`
+              : 'var(--grad-caramel)',
+            boxShadow: '0 4px 14px rgba(184,118,62,0.35)',
+          }}
+        />
+      )}
+      <Icon size={17} strokeWidth={active ? 2.5 : 2} className="flex-shrink-0 relative" />
+      <span className="truncate relative">{label}</span>
+    </motion.button>
   );
 }

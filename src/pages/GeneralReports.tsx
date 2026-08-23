@@ -33,7 +33,7 @@ import { computeModuleAnalytics, consolidateAnalytics, pickGranularity, Granular
 import { computeStockValuation } from '@/src/lib/stockValuation';
 import { summarizeInventaires } from '@/src/lib/inventaire';
 import { Cafeteria } from '@/src/lib/bizConfig';
-import { money, formatDate, PageHeader, Tabs, Table, Badge, Field, Input } from '@/src/components/biz/Kit';
+import { money, formatDate, PageHeader, Tabs, TabPanel, Table, Badge, Field, Input } from '@/src/components/biz/Kit';
 import ReportView from '@/src/components/biz/ReportView';
 import GlobalAnalyticsView from '@/src/components/biz/GlobalAnalyticsView';
 import StockValueView from '@/src/components/biz/StockValueView';
@@ -106,7 +106,7 @@ export default function GeneralReports() {
   const single = scope !== 'all' ? parts[0] : null;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={FileSpreadsheet} title="Rapports généraux"
         subtitle="Comptabilité et analyses de l'enseigne, sur la période de votre choix"
         actions={
@@ -184,151 +184,155 @@ export default function GeneralReports() {
         ]}
       />
 
-      {/* ── BILAN ─────────────────────────────────────────────────────── */}
-      {tab === 'bilan' && (
-        single
-          // Une seule cafétéria : son rapport complet, le même que sur son écran.
-          ? <ReportView report={single} />
-          : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <Kpi icon={TrendingUp} tone="green" label="Chiffre d'affaires" value={money(global.salesTotal)}
-                  sub={`${global.counts.sales} vente(s)`} />
-                <Kpi icon={Layers} tone="cyan" label="Marge brute" value={money(global.grossMargin)}
-                  sub={`coût marchandises ${money(global.cogs)}`} />
-                <Kpi icon={CircleDollarSign} tone={global.netGain >= 0 ? 'green' : 'red'}
-                  label="Résultat net" value={money(global.netGain)} sub="charges et pertes déduites" />
-                <Kpi icon={CreditCard} tone="red" label="Charges" value={money(global.expensesTotal)}
-                  sub={`salaires ${money(global.salariesPaid)}`} />
-                <Kpi icon={ShoppingCart} tone="purple" label="Achats" value={money(global.purchasesTotal)}
-                  sub={`${money(global.purchasesPaid)} réglés`} />
-                <Kpi icon={Truck} tone="amber" label="Dettes fournisseurs" value={money(global.supplierDebtTotal)}
-                  sub="toutes périodes" />
-                <Kpi icon={Users} tone="blue" label="Créances clients" value={money(global.clientDebtTotal)}
-                  sub={`avances détenues ${money(global.clientAdvanceTotal)}`} />
-                <Kpi icon={Boxes} tone="slate" label="Valeur du stock" value={money(global.stockValue)}
-                  sub={`${global.counts.products} référence(s)`} />
-              </div>
-
-              {/* Le compte de résultat, lisible de haut en bas. */}
-              <section className="card-glass p-5">
-                <h3 className="text-[12px] font-black uppercase tracking-widest text-[#4B3621] mb-4">
-                  Compte de résultat de la période
-                </h3>
-                <div className="max-w-2xl space-y-0.5">
-                  <PL label="Chiffre d'affaires" value={global.salesTotal} strong />
-                  <PL label="Retours & échanges" value={-global.returnsTotal} muted />
-                  <PL label="Coût des marchandises vendues" value={-global.cogs} />
-                  <PL label="Marge brute" value={global.grossMargin} rule strong />
-                  <PL label="Charges d'exploitation" value={-global.expensesTotal} />
-                  <PL label="Salaires versés" value={-global.salariesPaid} />
-                  <PL label="Pertes de production" value={-global.lossValue} muted />
-                  <PL label="Marchandise détruite" value={-global.destroyedValue} muted />
-                  <PL label="Résultat net" value={global.netGain} rule strong big />
+      {/* Le panneau glisse d'un onglet a l'autre — meme mouvement que
+          partout ailleurs dans l'application. */}
+      <TabPanel tabKey={tab}>
+        {/* ── BILAN ─────────────────────────────────────────────────────── */}
+        {tab === 'bilan' && (
+          single
+            // Une seule cafétéria : son rapport complet, le même que sur son écran.
+            ? <ReportView report={single} />
+            : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Kpi icon={TrendingUp} tone="green" label="Chiffre d'affaires" value={money(global.salesTotal)}
+                    sub={`${global.counts.sales} vente(s)`} />
+                  <Kpi icon={Layers} tone="cyan" label="Marge brute" value={money(global.grossMargin)}
+                    sub={`coût marchandises ${money(global.cogs)}`} />
+                  <Kpi icon={CircleDollarSign} tone={global.netGain >= 0 ? 'green' : 'red'}
+                    label="Résultat net" value={money(global.netGain)} sub="charges et pertes déduites" />
+                  <Kpi icon={CreditCard} tone="red" label="Charges" value={money(global.expensesTotal)}
+                    sub={`salaires ${money(global.salariesPaid)}`} />
+                  <Kpi icon={ShoppingCart} tone="purple" label="Achats" value={money(global.purchasesTotal)}
+                    sub={`${money(global.purchasesPaid)} réglés`} />
+                  <Kpi icon={Truck} tone="amber" label="Dettes fournisseurs" value={money(global.supplierDebtTotal)}
+                    sub="toutes périodes" />
+                  <Kpi icon={Users} tone="blue" label="Créances clients" value={money(global.clientDebtTotal)}
+                    sub={`avances détenues ${money(global.clientAdvanceTotal)}`} />
+                  <Kpi icon={Boxes} tone="slate" label="Valeur du stock" value={money(global.stockValue)}
+                    sub={`${global.counts.products} référence(s)`} />
                 </div>
-                <p className="text-[10.5px] text-[#A39588] mt-3 leading-relaxed">
-                  Les achats n'apparaissent pas en charge : ils entrent en STOCK. C'est le coût des
-                  marchandises <b>vendues</b> qui pèse sur le résultat — sinon un réapprovisionnement
-                  de fin de mois ferait plonger un mois pourtant bénéficiaire.
-                </p>
-              </section>
 
-              {/* La contribution de chaque cafétéria. */}
-              {parts.length > 1 && (
-                <section className="card-glass p-4">
-                  <h3 className="text-[12px] font-black uppercase tracking-widest text-[#4B3621] mb-3">
-                    Contribution de chaque cafétéria
+                {/* Le compte de résultat, lisible de haut en bas. */}
+                <section className="card-glass p-5">
+                  <h3 className="text-[12px] font-black uppercase tracking-widest text-[#4B3621] mb-4">
+                    Compte de résultat de la période
                   </h3>
-                  <Table head={<>
-                    <th className="table-head">Cafétéria</th>
-                    <th className="table-head text-right">CA</th>
-                    <th className="table-head text-right">Part</th>
-                    <th className="table-head text-right">Marge</th>
-                    <th className="table-head text-right">Charges</th>
-                    <th className="table-head text-right">Résultat</th>
-                    <th className="table-head text-right">Caisse</th>
-                    <th className="table-head text-right">Stock</th>
-                  </>}>
-                    {parts.map(p => {
-                      const share = global.salesTotal > 0 ? (p.salesTotal / global.salesTotal) * 100 : 0;
-                      return (
-                        <tr key={p.key}>
-                          <td className="table-cell font-bold">{p.emoji} {p.label}</td>
-                          <td className="table-cell text-right tabular-nums">{money(p.salesTotal)}</td>
-                          <td className="table-cell text-right tabular-nums text-[#A39588]">{share.toFixed(1)} %</td>
-                          <td className="table-cell text-right tabular-nums">{money(p.grossMargin)}</td>
-                          <td className="table-cell text-right tabular-nums text-red-600">{money(p.expensesTotal + p.salariesPaid)}</td>
-                          <td className={cn('table-cell text-right tabular-nums font-black',
-                            p.netGain >= 0 ? 'text-emerald-700' : 'text-red-600')}>{money(p.netGain)}</td>
-                          <td className={cn('table-cell text-right tabular-nums',
-                            p.caisseBalance < 0 && 'text-red-600')}>{money(p.caisseBalance)}</td>
-                          <td className="table-cell text-right tabular-nums">{money(p.stockValue)}</td>
-                        </tr>
-                      );
-                    })}
-                    <tr className="bg-[#FAF6F1]">
-                      <td className="table-cell font-black">Total enseigne</td>
-                      <td className="table-cell text-right tabular-nums font-black">{money(global.salesTotal)}</td>
-                      <td className="table-cell text-right tabular-nums font-black">100 %</td>
-                      <td className="table-cell text-right tabular-nums font-black">{money(global.grossMargin)}</td>
-                      <td className="table-cell text-right tabular-nums font-black text-red-600">
-                        {money(global.expensesTotal + global.salariesPaid)}
-                      </td>
-                      <td className={cn('table-cell text-right tabular-nums font-black',
-                        global.netGain >= 0 ? 'text-emerald-700' : 'text-red-600')}>{money(global.netGain)}</td>
-                      <td className="table-cell text-right tabular-nums font-black">
-                        {money(parts.reduce((s, p) => s + p.caisseBalance, 0))}
-                      </td>
-                      <td className="table-cell text-right tabular-nums font-black">{money(global.stockValue)}</td>
-                    </tr>
-                  </Table>
+                  <div className="max-w-2xl space-y-0.5">
+                    <PL label="Chiffre d'affaires" value={global.salesTotal} strong />
+                    <PL label="Retours & échanges" value={-global.returnsTotal} muted />
+                    <PL label="Coût des marchandises vendues" value={-global.cogs} />
+                    <PL label="Marge brute" value={global.grossMargin} rule strong />
+                    <PL label="Charges d'exploitation" value={-global.expensesTotal} />
+                    <PL label="Salaires versés" value={-global.salariesPaid} />
+                    <PL label="Pertes de production" value={-global.lossValue} muted />
+                    <PL label="Marchandise détruite" value={-global.destroyedValue} muted />
+                    <PL label="Résultat net" value={global.netGain} rule strong big />
+                  </div>
+                  <p className="text-[10.5px] text-[#A39588] mt-3 leading-relaxed">
+                    Les achats n'apparaissent pas en charge : ils entrent en STOCK. C'est le coût des
+                    marchandises <b>vendues</b> qui pèse sur le résultat — sinon un réapprovisionnement
+                    de fin de mois ferait plonger un mois pourtant bénéficiaire.
+                  </p>
                 </section>
-              )}
 
-              {/* La trésorerie : les tiroirs + le coffre. */}
-              <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <Kpi icon={Wallet} tone="amber" label="Espèces aux comptoirs"
-                  value={money(parts.reduce((s, p) => s + p.caisseBalance, 0))}
-                  sub={`${parts.length} tiroir(s)`} />
-                <Kpi icon={Vault} tone="purple" label="Caisse générale" value={money(generalCash)}
-                  sub="le coffre de l'enseigne" />
-                <Kpi icon={Coffee} tone="green" label="Trésorerie totale"
-                  value={money(generalCash + parts.reduce((s, p) => s + p.caisseBalance, 0))}
-                  sub="coffre + tiroirs" />
-              </section>
+                {/* La contribution de chaque cafétéria. */}
+                {parts.length > 1 && (
+                  <section className="card-glass p-4">
+                    <h3 className="text-[12px] font-black uppercase tracking-widest text-[#4B3621] mb-3">
+                      Contribution de chaque cafétéria
+                    </h3>
+                    <Table head={<>
+                      <th className="table-head">Cafétéria</th>
+                      <th className="table-head text-right">CA</th>
+                      <th className="table-head text-right">Part</th>
+                      <th className="table-head text-right">Marge</th>
+                      <th className="table-head text-right">Charges</th>
+                      <th className="table-head text-right">Résultat</th>
+                      <th className="table-head text-right">Caisse</th>
+                      <th className="table-head text-right">Stock</th>
+                    </>}>
+                      {parts.map(p => {
+                        const share = global.salesTotal > 0 ? (p.salesTotal / global.salesTotal) * 100 : 0;
+                        return (
+                          <tr key={p.key}>
+                            <td className="table-cell font-bold">{p.emoji} {p.label}</td>
+                            <td className="table-cell text-right tabular-nums">{money(p.salesTotal)}</td>
+                            <td className="table-cell text-right tabular-nums text-[#A39588]">{share.toFixed(1)} %</td>
+                            <td className="table-cell text-right tabular-nums">{money(p.grossMargin)}</td>
+                            <td className="table-cell text-right tabular-nums text-red-600">{money(p.expensesTotal + p.salariesPaid)}</td>
+                            <td className={cn('table-cell text-right tabular-nums font-black',
+                              p.netGain >= 0 ? 'text-emerald-700' : 'text-red-600')}>{money(p.netGain)}</td>
+                            <td className={cn('table-cell text-right tabular-nums',
+                              p.caisseBalance < 0 && 'text-red-600')}>{money(p.caisseBalance)}</td>
+                            <td className="table-cell text-right tabular-nums">{money(p.stockValue)}</td>
+                          </tr>
+                        );
+                      })}
+                      <tr className="bg-[#FAF6F1]">
+                        <td className="table-cell font-black">Total enseigne</td>
+                        <td className="table-cell text-right tabular-nums font-black">{money(global.salesTotal)}</td>
+                        <td className="table-cell text-right tabular-nums font-black">100 %</td>
+                        <td className="table-cell text-right tabular-nums font-black">{money(global.grossMargin)}</td>
+                        <td className="table-cell text-right tabular-nums font-black text-red-600">
+                          {money(global.expensesTotal + global.salariesPaid)}
+                        </td>
+                        <td className={cn('table-cell text-right tabular-nums font-black',
+                          global.netGain >= 0 ? 'text-emerald-700' : 'text-red-600')}>{money(global.netGain)}</td>
+                        <td className="table-cell text-right tabular-nums font-black">
+                          {money(parts.reduce((s, p) => s + p.caisseBalance, 0))}
+                        </td>
+                        <td className="table-cell text-right tabular-nums font-black">{money(global.stockValue)}</td>
+                      </tr>
+                    </Table>
+                  </section>
+                )}
 
-              {/* Ce qui demande une action. */}
-              {(global.stockAlerts > 0 || global.expiryAlerts > 0) && (
-                <section className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 flex flex-wrap gap-4">
-                  {global.stockAlerts > 0 && (
-                    <Alert icon={PackageX} label={`${global.stockAlerts} produit(s) sous le seuil`} />
-                  )}
-                  {global.expiryAlerts > 0 && (
-                    <Alert icon={AlertTriangle} label={`${global.expiryAlerts} péremption(s) proche(s)`} />
-                  )}
+                {/* La trésorerie : les tiroirs + le coffre. */}
+                <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <Kpi icon={Wallet} tone="amber" label="Espèces aux comptoirs"
+                    value={money(parts.reduce((s, p) => s + p.caisseBalance, 0))}
+                    sub={`${parts.length} tiroir(s)`} />
+                  <Kpi icon={Vault} tone="purple" label="Caisse générale" value={money(generalCash)}
+                    sub="le coffre de l'enseigne" />
+                  <Kpi icon={Coffee} tone="green" label="Trésorerie totale"
+                    value={money(generalCash + parts.reduce((s, p) => s + p.caisseBalance, 0))}
+                    sub="coffre + tiroirs" />
                 </section>
-              )}
-            </div>
-          )
-      )}
 
-      {/* ── ANALYSES ──────────────────────────────────────────────────── */}
-      {tab === 'analyses' && (
-        <GlobalAnalyticsView
-          global={globalAnalytics}
-          parts={analytics}
-          onGranularity={setGrain}
-        />
-      )}
+                {/* Ce qui demande une action. */}
+                {(global.stockAlerts > 0 || global.expiryAlerts > 0) && (
+                  <section className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 flex flex-wrap gap-4">
+                    {global.stockAlerts > 0 && (
+                      <Alert icon={PackageX} label={`${global.stockAlerts} produit(s) sous le seuil`} />
+                    )}
+                    {global.expiryAlerts > 0 && (
+                      <Alert icon={AlertTriangle} label={`${global.expiryAlerts} péremption(s) proche(s)`} />
+                    )}
+                  </section>
+                )}
+              </div>
+            )
+        )}
 
-      {/* ── STOCK ─────────────────────────────────────────────────────── */}
-      {tab === 'stock' && <StockValueView valuation={valuation} />}
+        {/* ── ANALYSES ──────────────────────────────────────────────────── */}
+        {tab === 'analyses' && (
+          <GlobalAnalyticsView
+            global={globalAnalytics}
+            parts={analytics}
+            onGranularity={setGrain}
+          />
+        )}
 
-      {/* ── INVENTAIRES ───────────────────────────────────────────────── */}
-      {tab === 'inventaires' && <InventaireReportView parts={inventaires} />}
+        {/* ── STOCK ─────────────────────────────────────────────────────── */}
+        {tab === 'stock' && <StockValueView valuation={valuation} />}
 
-      {/* ── EMPLOYÉS ──────────────────────────────────────────────────── */}
-      {tab === 'employes' && <WorkforceTab parts={parts} cafeterias={shownCafeterias} />}
+        {/* ── INVENTAIRES ───────────────────────────────────────────────── */}
+        {tab === 'inventaires' && <InventaireReportView parts={inventaires} />}
+
+        {/* ── EMPLOYÉS ──────────────────────────────────────────────────── */}
+        {tab === 'employes' && <WorkforceTab parts={parts} cafeterias={shownCafeterias} />}
+      </TabPanel>
 
       {/* La feuille A4, hors écran : c'est elle que `printFiche` clone. */}
       <div className="hidden">

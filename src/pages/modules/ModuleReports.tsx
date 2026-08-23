@@ -53,7 +53,7 @@ export default function ModuleReports({ moduleKey }: { moduleKey: ModuleKey }) {
   const generate = () => setRange({ from, to });
 
   return (
-    <div className="space-y-6 animate-fade-in max-w-[1600px] mx-auto pb-16">
+    <div className="space-y-6 max-w-[1600px] mx-auto pb-16">
       <PageHeader icon={BarChart3} title="Rapports" subtitle={`${cfg.label} — bilan, bénéfices par produit & analyses`}
         actions={<button className="btn-primary" onClick={() => printFiche(ficheRef.current)}><Printer className="w-4 h-4" /> Imprimer la fiche</button>} />
 

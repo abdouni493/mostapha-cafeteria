@@ -159,7 +159,7 @@ export default function Dashboard() {
   const scopeCaf = scope === 'all' ? null : visible.find(c => c.id === scope) || null;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ── En-tête + bascule de portée ───────────────────────────────── */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>

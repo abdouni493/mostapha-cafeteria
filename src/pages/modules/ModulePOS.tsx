@@ -515,7 +515,7 @@ export default function ModulePOS({ moduleKey }: { moduleKey: ModuleKey }) {
   }, []);
 
   return (
-    <div ref={posRootRef} className="space-y-4 animate-fade-in">
+    <div ref={posRootRef} className="space-y-4">
       <PageHeader icon={ShoppingBag} title="Point de vente" subtitle={`${cfg.label} — caisse & encaissement`}
         actions={<div className="flex items-center gap-2 flex-wrap">
           {/* Afficheur client — la fenêtre à poser sur le petit second écran du

@@ -23,7 +23,7 @@ export default function ModuleProduction({ moduleKey }: { moduleKey: ModuleKey }
   const [tab, setTab] = useState<'prod' | 'fiche'>('prod');
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={FlaskConical} title="Production" subtitle={`${cfg.label} — fabrication & fiches techniques`}
         actions={<TabAction tab={tab} moduleKey={moduleKey} />} />
 
@@ -308,7 +308,7 @@ function ProductionForm({ moduleKey, onClose }: { moduleKey: ModuleKey; onClose:
             <div>
               <label className="label-field">3. Ingrédients & vérification stock</label>
               {stockIssues.length > 0 && (
-                <div className="mb-2 rounded-xl bg-red-50 border border-red-200 p-3 flex items-center gap-2 text-red-700 animate-fade-in">
+                <div className="mb-2 rounded-xl bg-red-50 border border-red-200 p-3 flex items-center gap-2 text-red-700">
                   <AlertTriangle className="w-5 h-5" /> <span className="font-bold text-sm">Stock insuffisant ! Ajustez la quantité ou réapprovisionnez.</span>
                 </div>
               )}

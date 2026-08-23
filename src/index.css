@@ -114,39 +114,37 @@ body {
 
 /* ============================
    ANIMATIONS
+   ──────────────────────────────────────────────────────────────────────────
+   IL N'EN RESTE QUE TROIS, ET C'EST VOULU.
+
+   Toutes les entrées et sorties de l'application — écrans, dialogues, menus,
+   cartes, messages — sont décrites dans `src/lib/motion.ts` et jouées par
+   Motion. Ce fichier en portait une douzaine d'équivalents CSS : deux façons
+   de faire la même chose, donc la garantie qu'un écran finirait par bouger
+   autrement que ses voisins.
+
+   Ce qui subsiste ici est ce que Motion n'a aucune raison de porter :
+     • une boucle décorative (la vapeur de la tasse au chargement) ;
+     • la rotation du rouet ;
+     • le remplissage d'une barre de progression.
 ============================ */
 @keyframes fadeIn       { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fadeInUp     { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-@keyframes fadeInDown   { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
-@keyframes fadeInLeft   { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
-@keyframes fadeInRight  { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
-@keyframes scaleIn      { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
-@keyframes float        { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-@keyframes glowCaramel  { 0%, 100% { box-shadow: 0 0 12px rgba(212,163,115,0.45); } 50% { box-shadow: 0 0 28px rgba(212,163,115,0.75); } }
 @keyframes spin         { to { transform: rotate(360deg); } }
 @keyframes progressFill { from { width: 0; } }
-/* La vapeur qui monte d'une tasse — l'écran de chargement et le logo s'en servent. */
-@keyframes steam        { 0% { opacity: 0; transform: translateY(4px) scaleX(0.9); }
-                          40% { opacity: 0.8; }
-                          100% { opacity: 0; transform: translateY(-14px) scaleX(1.15); } }
 
-.animate-fade-in       { animation: fadeIn 0.4s ease-out both; }
-.animate-fade-in-up    { animation: fadeInUp 0.5s ease-out both; }
-.animate-fade-in-down  { animation: fadeInDown 0.4s ease-out both; }
-.animate-fade-in-left  { animation: fadeInLeft 0.5s ease-out both; }
-.animate-fade-in-right { animation: fadeInRight 0.5s ease-out both; }
-.animate-scale-in      { animation: scaleIn 0.3s ease-out both; }
-.animate-float         { animation: float 3s ease-in-out infinite; }
-.animate-glow-yellow   { animation: glowCaramel 2s ease-in-out infinite; }
-.animate-steam         { animation: steam 2.4s ease-out infinite; }
+/* La vapeur qui monte d'une tasse — le seul indice que l'écran de chargement
+   est vivant quand le réseau est lent. */
+@keyframes steam {
+  0%   { opacity: 0; transform: translateY(4px) scaleX(0.9); }
+  40%  { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-14px) scaleX(1.15); }
+}
+.animate-steam { animation: steam 2.4s ease-out infinite; }
 
-.delay-100 { animation-delay: 0.10s; }
-.delay-200 { animation-delay: 0.20s; }
-.delay-300 { animation-delay: 0.30s; }
-.delay-400 { animation-delay: 0.40s; }
-.delay-500 { animation-delay: 0.50s; }
-
-/* Un mouvement qui gêne se coupe — réglage système, jamais discuté. */
+/* Un mouvement qui gêne se coupe — réglage système, jamais discuté.
+   Motion lit le MÊME réglage de son côté (`useMotionPrefs`) : la règle CSS
+   ci-dessous n'est donc pas une redondance, c'est le filet pour tout ce qui
+   n'est pas piloté par Motion. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -457,10 +455,10 @@ tr:hover .table-cell { background: rgba(212, 163, 115, 0.07); }
   box-shadow: 0 32px 80px rgba(28, 17, 11, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
 }
 
-/* Entrée des dialogues qui ne sont PAS pilotés par motion. Une animation CSS
-   écrase les styles en ligne tant qu'elle tourne : la garder sur toutes les
-   .modal-box combattait la transformation de framer-motion. */
-.modal-box-anim { animation: modalDrop 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+/* Plus aucun dialogue n'entre par une animation CSS : tous passent par
+   `dialogVariants` / `confirmVariants`. Une animation CSS écrase de toute
+   façon les styles en ligne tant qu'elle tourne — elle combattait la
+   transformation de Motion au lieu de s'y ajouter. */
 
 /* Espace de travail pleine hauteur : l'en-tête et le pied restent en place,
    seul le corps défile. Déclaré après .modal-box pour gagner sur elle. */
@@ -477,7 +475,6 @@ tr:hover .table-cell { background: rgba(212, 163, 115, 0.07); }
 .modal-box-full > .modal-header,
 .modal-box-full > .modal-footer { flex-shrink: 0; }
 
-@keyframes modalDrop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: none; } }
 
 .modal-header {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
@@ -547,11 +544,6 @@ tr:hover .table-cell { background: rgba(212, 163, 115, 0.07); }
 .btn-primary, .btn-secondary { transition: transform 0.1s ease, box-shadow 0.1s ease; }
 .btn-primary:active, .btn-secondary:active { transform: scale(0.97); }
 
-@keyframes pulse-ring {
-  0%   { transform: scale(0.95); opacity: 1; }
-  100% { transform: scale(1.8);  opacity: 0; }
-}
-.pulse-ring { animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
 /* Le liseré coloré d'une cafétéria — chaque partie a sa teinte, posée en
    variable par le composant : `style={{ '--caf-color': cfg.color }}`. */

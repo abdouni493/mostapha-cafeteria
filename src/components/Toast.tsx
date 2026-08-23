@@ -12,6 +12,7 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, AlertCircle, Info, X, AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useMotionPrefs } from '../lib/motion';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -46,13 +47,17 @@ const ToastItem: React.FC<{ toast: ToastMessage; onClose: (id: string) => void }
   }, [toast.id, toast.duration, onClose]);
 
   const tone = TONE[toast.type] || TONE.info;
+  const m = useMotionPrefs();
 
+  /**
+   * `layout` fait GLISSER les messages déjà affichés quand celui du dessus
+   * disparaît, au lieu de les faire sauter d'un cran. Sur une pile de trois
+   * bandeaux, c'est la différence entre une liste vivante et un clignotement.
+   */
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: 40, scale: 0.95 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.18 } }}
+      variants={m.toast} initial="hidden" animate="show" exit="out"
       className={cn(
         'pointer-events-auto flex items-start gap-3 p-3.5 pr-2.5 rounded-2xl border bg-white',
         'min-w-[18rem] max-w-[26rem]',
@@ -70,13 +75,14 @@ const ToastItem: React.FC<{ toast: ToastMessage; onClose: (id: string) => void }
           <p className="text-[11.5px] text-[#7A6A5C] leading-relaxed mt-0.5 break-words">{toast.message}</p>
         )}
       </div>
-      <button
+      <motion.button
         onClick={() => onClose(toast.id)}
         aria-label="Fermer"
+        {...m.press}
         className="p-1.5 rounded-lg text-[#C9B7A5] hover:bg-[#F3EBE2] hover:text-[#7A6A5C] transition flex-shrink-0"
       >
         <X className="w-3.5 h-3.5" />
-      </button>
+      </motion.button>
     </motion.div>
   );
 };

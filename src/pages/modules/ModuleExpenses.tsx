@@ -83,7 +83,7 @@ export default function ModuleExpenses({ moduleKey }: { moduleKey: ModuleKey }) 
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={CreditCard} title="Dépenses" subtitle={`${cfg.label} — charges et sorties de caisse`}
         actions={perm.creer
           ? <button className="btn-primary" onClick={() => setForm('new')}><Plus className="w-4 h-4" /> Nouvelle dépense</button>

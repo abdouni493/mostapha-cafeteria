@@ -27,6 +27,7 @@ import { cn } from '../lib/utils';
 import { useAppState } from '../store/AppContext';
 import { useBizAll, useCafeterias } from '../store/BizContext';
 import { MODULE_INTERFACES, routeBaseOf } from '../lib/bizConfig';
+import { useMotionPrefs } from '../lib/motion';
 
 const IFACE_ICON: Record<string, React.ElementType> = {
   stock: Boxes, inventaire: ClipboardList, purchases: Truck, production: ChefHat,
@@ -52,6 +53,7 @@ const CommandPalette: React.FC = () => {
   const [search, setSearch] = useState('');
   const [index, setIndex] = useState(0);
   const navigate = useNavigate();
+  const m = useMotionPrefs();
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -197,17 +199,21 @@ const CommandPalette: React.FC = () => {
       {open && (
         <div className="fixed inset-0 z-[70] flex items-start justify-center pt-[12vh] px-4">
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            variants={m.backdrop} initial="hidden" animate="show" exit="out"
             onClick={() => setOpen(false)}
             className="absolute inset-0 bg-[#1C110B]/55 backdrop-blur-sm"
           />
+          {/* Elle DESCEND du haut de l'écran, contrairement aux dialogues qui
+              montent : elle ne remplace pas la page, elle se pose par-dessus,
+              comme la barre d'adresse d'un navigateur. */}
           <motion.div
-            initial={{ opacity: 0, y: -12, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -12, scale: 0.97 }}
-            transition={{ duration: 0.18 }}
+            variants={m.popover} initial="hidden" animate="show" exit="out"
             className="relative w-full max-w-xl rounded-2xl overflow-hidden bg-white"
-            style={{ boxShadow: '0 32px 80px rgba(28,17,11,0.4)', border: '1px solid #EFE5DA' }}
+            style={{
+              transformOrigin: 'top center',
+              boxShadow: '0 32px 80px rgba(28,17,11,0.4)',
+              border: '1px solid #EFE5DA',
+            }}
           >
             <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#F3EBE2]">
               <Search className="w-4 h-4 text-[#A39588] flex-shrink-0" />

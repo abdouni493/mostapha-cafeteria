@@ -129,6 +129,35 @@ de recherche ne quitte jamais la page en cours.
 
 ---
 
+## Le mouvement
+
+Toutes les entrées et sorties de l'application — écrans, dialogues, menus,
+cartes, messages — sont décrites dans un seul fichier,
+[`src/lib/motion.ts`](src/lib/motion.ts), et jouées par Motion (Framer Motion).
+
+Trois règles y tiennent tout :
+
+1. **On n'anime que `transform` et `opacity`** — les deux seules propriétés que
+   le navigateur compose sur le GPU sans recalculer la mise en page. Une grille
+   de deux cents produits reste fluide sur le poste du comptoir.
+2. **Ce qui entre arrive de là où on l'a appelé.** Un dialogue monte, un menu
+   descend, un panneau vient du côté. Le mouvement dit d'où vient la chose — on
+   n'a pas à la chercher des yeux.
+3. **La sortie est plus rapide que l'entrée.** On regarde ce qui arrive ; on
+   n'attend jamais ce qui part.
+
+Deux détails qui font le lien entre le clic et ce qui se passe :
+
+- La **pastille active** de la barre latérale *glisse* vers l'écran qu'on vient
+  d'ouvrir (`layoutId`) au lieu de s'éteindre ici et de se rallumer là-bas.
+- L'écran quitté **sort avant** que le suivant entre (`mode="wait"`), sinon les
+  deux se superposent une fraction de seconde.
+
+Le réglage système **« réduire les animations »** est respecté : `useMotionPrefs()`
+réduit alors tout à un fondu. Rien ne bouge, mais rien ne saute non plus.
+
+---
+
 ## Comment les données sont rangées
 
 L'exploitation d'une cafétéria (stock, ventes, achats, clients, caisse…) vit

@@ -71,7 +71,7 @@ export default function ModuleComptoir({ moduleKey }: { moduleKey: ModuleKey }) 
   const toggleSel = (id: string) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <PageHeader icon={Beaker} title="Comptoir" subtitle={`${cfg.label} — produits prêts à la vente`} />
 
       <CafeteriaSwitcher current={moduleKey} />

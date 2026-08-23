@@ -19,6 +19,7 @@ import { useAppState } from "../store/AppContext";
 import { useBizAll, useCafeterias } from "../store/BizContext";
 import { MODULE_INTERFACES, getModuleConfig } from "../lib/bizConfig";
 import { useCafeteriaAlerts, useDismissedAlerts, CafAlert } from "../hooks/useCafeteriaAlerts";
+import { useMotionPrefs } from "../lib/motion";
 
 interface NavbarProps {
   onMenuToggle: () => void;
@@ -41,6 +42,7 @@ const IFACE_LABEL: Record<string, string> =
 const Navbar = ({ onMenuToggle, sidebarOpen, activePath }: NavbarProps) => {
   const { i18n } = useTranslation();
   const isRtl = i18n.dir() === "rtl";
+  const m = useMotionPrefs();
   const navigate = useNavigate();
 
   const { settings, currentUserAvatarUrl, currentUserName, currentUserRole, currentModuleWorker } = useAppState();
@@ -171,8 +173,9 @@ const Navbar = ({ onMenuToggle, sidebarOpen, activePath }: NavbarProps) => {
 
         {/* Cloche */}
         <div className="relative" ref={alertsRef}>
-          <button
+          <motion.button
             onClick={() => setAlertsOpen(o => !o)}
+            {...m.press}
             className="relative p-2 rounded-xl text-[#7A6A5C] hover:bg-[#F3EBE2] hover:text-[#6F4E37] transition"
             aria-label={`${alerts.length} alerte(s)`}
           >
@@ -187,17 +190,18 @@ const Navbar = ({ onMenuToggle, sidebarOpen, activePath }: NavbarProps) => {
                 {alerts.length > 9 ? '9+' : alerts.length}
               </span>
             )}
-          </button>
+          </motion.button>
 
           <AnimatePresence>
             {alertsOpen && (
               <motion.div
-                initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                transition={{ duration: 0.15 }}
+                variants={m.popover} initial="hidden" animate="show" exit="out"
                 className="absolute right-0 mt-2 w-[22rem] max-w-[calc(100vw-2rem)] rounded-2xl overflow-hidden z-50 bg-white"
-                style={{ border: "1px solid #EFE5DA", boxShadow: "0 24px 60px rgba(75,54,33,0.22)" }}
+                style={{
+                  transformOrigin: 'top right',
+                  border: "1px solid #EFE5DA",
+                  boxShadow: "0 24px 60px rgba(75,54,33,0.22)",
+                }}
               >
                 <div className="px-4 py-3 flex items-center justify-between" style={{ background: "var(--grad-coffee)" }}>
                   <p className="text-[12px] font-black text-white uppercase tracking-wider">

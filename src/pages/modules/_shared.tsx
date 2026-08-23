@@ -11,6 +11,7 @@ import {
   AlertTriangle, Search, Pencil, Car, Plus, Trash2, Clock, ScanLine,
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { AnimatePresence, motion } from 'motion/react';
 import { newId, formatCurrency } from '@/src/lib/utils';
 const fc = (n: number) => formatCurrency(Number.isFinite(n) ? n : 0);
 import { BizApi, useActiveCafeterias, useConfirmProduct } from '@/src/store/BizContext';
@@ -20,6 +21,7 @@ import { saveDraft, resolveDraft, failDraft, ProductDraft } from '@/src/lib/prod
 import { Modal, ModalPortal, Field, Input, Textarea, Select, Switch, InlineCreate } from '@/src/components/biz/Kit';
 import BarcodeScannerModal from '@/src/components/BarcodeScannerModal';
 import { uploadFile, BUCKETS } from '@/src/lib/supabase';
+import { useMotionPrefs } from '@/src/lib/motion';
 
 // ─── Barcode helpers ──────────────────────────────────────────────────────────
 export function genBarcode(): string {
@@ -1312,29 +1314,48 @@ export function AskPrintModal({
   open: boolean; title?: string; message?: string;
   onPrint: () => void; onSkip: () => void;
 }) {
-  if (!open) return null;
+  const m = useMotionPrefs();
+  /**
+   * C'était le dernier dialogue à s'ouvrir par une animation CSS : il
+   * apparaissait un peu autrement que tous les autres, et surtout il
+   * disparaissait sans transition. Il parle maintenant la même langue que le
+   * reste (`confirm`) — et il arrive juste après un encaissement, le moment où
+   * une saccade se remarque le plus.
+   */
   return (
     <ModalPortal>
-    <div className="modal-shell" style={{ zIndex: 80 }} onClick={onSkip}>
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-      <div className="modal-box modal-box-anim max-w-sm relative z-10" onClick={e => e.stopPropagation()}>
-        <div className="p-6">
-          <div className="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center mb-4">
-            <Printer className="w-6 h-6 text-[#003087]" />
+      <AnimatePresence>
+        {open && (
+          <div className="modal-shell" style={{ zIndex: 80 }} onClick={onSkip}>
+            <motion.div
+              variants={m.backdrop} initial="hidden" animate="show" exit="out"
+              className="absolute inset-0 bg-[#1C110B]/55 backdrop-blur-sm"
+            />
+            <motion.div
+              variants={m.confirm} initial="hidden" animate="show" exit="out"
+              className="modal-box max-w-sm relative z-10" onClick={e => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#F5E7D8] flex items-center justify-center mb-4">
+                  <Printer className="w-6 h-6 text-[#8A5A2B]" />
+                </div>
+                <h3 className="text-base font-black text-[#4B3621] mb-2">{title}</h3>
+                <p className="text-sm text-[#7A6A5C]">
+                  {message || "Le document reprend les informations de l'enseigne, du client et du paiement."}
+                </p>
+              </div>
+              <div className="p-6 pt-0 flex gap-3">
+                <motion.button onClick={onSkip} className="btn-ghost flex-1" {...m.pressSubtle}>
+                  Non, merci
+                </motion.button>
+                <motion.button onClick={onPrint} className="btn-primary flex-1" {...m.press}>
+                  <Printer className="w-4 h-4" /> Imprimer
+                </motion.button>
+              </div>
+            </motion.div>
           </div>
-          <h3 className="text-base font-black text-[#002d87] mb-2">{title}</h3>
-          <p className="text-sm text-slate-500">
-            {message || 'Le document reprend les informations de la station, du client et du paiement.'}
-          </p>
-        </div>
-        <div className="p-6 pt-0 flex gap-3">
-          <button onClick={onSkip} className="btn-ghost flex-1">Non, merci</button>
-          <button onClick={onPrint} className="btn-primary flex-1">
-            <Printer className="w-4 h-4" /> Imprimer
-          </button>
-        </div>
-      </div>
-    </div>
+        )}
+      </AnimatePresence>
     </ModalPortal>
   );
 }

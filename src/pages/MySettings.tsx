@@ -137,7 +137,7 @@ export default function MySettings() {
   };
 
   return (
-    <div className="space-y-5 animate-fade-in max-w-4xl">
+    <div className="space-y-5 max-w-4xl">
       <PageHeader icon={UserCircle} title="Mon profil" subtitle="Informations personnelles, accès et connexion" />
 
       {/* ── Qui je suis ─────────────────────────────────────────────── */}
