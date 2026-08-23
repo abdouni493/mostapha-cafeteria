@@ -1,0 +1,12 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+
+# Les identifiants Supabase ne rentrent pas dans Git : seul l'exemple est suivi.
+.env*
+!.env.example
+
+supabase/.temp/

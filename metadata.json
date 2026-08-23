@@ -1,0 +1,6 @@
+{
+  "name": "Altech Cafeteria",
+  "description": "Gestion multi-cafeterias : stock, achats, point de vente, ventes, clients, fournisseurs, employes, caisse et rapports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

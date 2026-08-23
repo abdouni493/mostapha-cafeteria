@@ -1,0 +1,621 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ALTECH CAFÉTÉRIA — PALETTE « CAFÉ »
+   ──────────────────────────────────────────────────────────────────────────
+   Trois familles, et rien d'autre :
+     • ESPRESSO  (#2B1B12 → #6F4E37) — les fonds sombres, la barre latérale,
+       les en-têtes. C'est la couleur d'un grain torréfié.
+     • CARAMEL   (#D4A373 → #B8763E) — l'accent : boutons, actifs, mises en
+       valeur. C'est la couleur du lait dans le café.
+     • CRÈME     (#FAF6F1 → #EFE5DA) — les surfaces claires, le papier.
+   Les couleurs d'ÉTAT (succès, alerte, danger) restent volontairement hors de
+   cette palette : un stock en rupture doit crier, pas s'harmoniser.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Constantes de mise en page */
+  --sidebar-width: 288px;
+
+  /* ── Espresso ── */
+  --coffee-950: #1C110B;
+  --coffee-900: #2B1B12;
+  --coffee-800: #3B2519;
+  --coffee-700: #4B3621;
+  --coffee-600: #5C4033;
+  --coffee-500: #6F4E37;
+  --coffee-400: #8C6A4E;
+
+  /* ── Caramel (accent) ── */
+  --caramel-700: #8A5A2B;
+  --caramel-600: #A56B33;
+  --caramel-500: #B8763E;
+  --caramel-400: #C89466;
+  --caramel-300: #D4A373;
+  --caramel-200: #E7C9A9;
+  --caramel-100: #F5E7D8;
+
+  /* ── Crème ── */
+  --cream-50:  #FDFBF8;
+  --cream-100: #FAF6F1;
+  --cream-200: #F3EBE2;
+  --cream-300: #EFE5DA;
+  --cream-400: #E2D3C4;
+
+  /* Rôles — c'est par eux que passent les composants */
+  --color-primary: var(--coffee-700);
+  --color-primary-dark: var(--coffee-900);
+  --color-primary-light: var(--coffee-500);
+  --color-secondary: var(--caramel-300);
+  --color-secondary-dark: var(--caramel-500);
+  --color-surface: var(--cream-100);
+  --color-card: #ffffff;
+  --font-family-sans: "Outfit", "Cairo", ui-sans-serif, system-ui, sans-serif;
+
+  /* Fonds */
+  --bg-primary: #ffffff;
+  --bg-secondary: var(--cream-100);
+  --bg-tertiary: var(--cream-200);
+
+  /* Texte */
+  --text-primary: #2A2018;
+  --text-secondary: #7A6A5C;
+  --text-tertiary: #A39588;
+
+  /* Bordures */
+  --border-color: var(--cream-300);
+
+  /* Ombres — teintées café plutôt que grises : sur un fond crème, une ombre
+     neutre paraît sale, une ombre chaude paraît posée. */
+  --shadow-card: 0 4px 20px rgba(75, 54, 33, 0.08), 0 1px 4px rgba(75, 54, 33, 0.05);
+  --shadow-lg:   0 12px 40px rgba(75, 54, 33, 0.13);
+  --shadow-xl:   0 24px 64px rgba(43, 27, 18, 0.20);
+
+  /* Dégradés réutilisés */
+  --grad-coffee:  linear-gradient(135deg, var(--coffee-900) 0%, var(--coffee-700) 55%, var(--coffee-500) 100%);
+  --grad-caramel: linear-gradient(135deg, var(--caramel-300), var(--caramel-500));
+}
+
+/* Mode sombre — « café de nuit » : les mêmes grains, moins de lait. */
+[data-theme="dark"] {
+  --bg-primary: #171009;
+  --bg-secondary: #1F1710;
+  --bg-tertiary: #2B211A;
+  --color-surface: #171009;
+  --color-card: #211913;
+  --text-primary: #F3EBE2;
+  --text-secondary: #C9B7A5;
+  --text-tertiary: #9A8877;
+  --border-color: #3A2C22;
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg:   0 12px 40px rgba(0, 0, 0, 0.55);
+  --shadow-xl:   0 24px 64px rgba(0, 0, 0, 0.65);
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--color-surface);
+  color: var(--text-primary);
+  /* Deux halos très doux : la page ne doit pas être un aplat de crème mort. */
+  background-image:
+    radial-gradient(ellipse at 8% 0%,   rgba(111, 78, 55, 0.07) 0%, transparent 52%),
+    radial-gradient(ellipse at 92% 100%, rgba(212, 163, 115, 0.10) 0%, transparent 55%);
+  background-attachment: fixed;
+}
+
+[dir="rtl"] { font-family: "Cairo", sans-serif; }
+
+/* ============================
+   ANIMATIONS
+============================ */
+@keyframes fadeIn       { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInUp     { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes fadeInDown   { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+@keyframes fadeInLeft   { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+@keyframes fadeInRight  { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+@keyframes scaleIn      { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes float        { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes glowCaramel  { 0%, 100% { box-shadow: 0 0 12px rgba(212,163,115,0.45); } 50% { box-shadow: 0 0 28px rgba(212,163,115,0.75); } }
+@keyframes spin         { to { transform: rotate(360deg); } }
+@keyframes progressFill { from { width: 0; } }
+/* La vapeur qui monte d'une tasse — l'écran de chargement et le logo s'en servent. */
+@keyframes steam        { 0% { opacity: 0; transform: translateY(4px) scaleX(0.9); }
+                          40% { opacity: 0.8; }
+                          100% { opacity: 0; transform: translateY(-14px) scaleX(1.15); } }
+
+.animate-fade-in       { animation: fadeIn 0.4s ease-out both; }
+.animate-fade-in-up    { animation: fadeInUp 0.5s ease-out both; }
+.animate-fade-in-down  { animation: fadeInDown 0.4s ease-out both; }
+.animate-fade-in-left  { animation: fadeInLeft 0.5s ease-out both; }
+.animate-fade-in-right { animation: fadeInRight 0.5s ease-out both; }
+.animate-scale-in      { animation: scaleIn 0.3s ease-out both; }
+.animate-float         { animation: float 3s ease-in-out infinite; }
+.animate-glow-yellow   { animation: glowCaramel 2s ease-in-out infinite; }
+.animate-steam         { animation: steam 2.4s ease-out infinite; }
+
+.delay-100 { animation-delay: 0.10s; }
+.delay-200 { animation-delay: 0.20s; }
+.delay-300 { animation-delay: 0.30s; }
+.delay-400 { animation-delay: 0.40s; }
+.delay-500 { animation-delay: 0.50s; }
+
+/* Un mouvement qui gêne se coupe — réglage système, jamais discuté. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================
+   CARTES
+============================ */
+.card-glass {
+  border-radius: 1.15rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(239, 229, 218, 0.85);
+  box-shadow: var(--shadow-card);
+  transition: all 0.25s;
+}
+.card-glass:hover { box-shadow: var(--shadow-lg); }
+
+/* Carte « signature » : un filet caramel en haut, comme la crème sur un café. */
+.card-naftal, .card-coffee {
+  border-radius: 1.15rem;
+  background: var(--color-card);
+  border: 1px solid rgba(111, 78, 55, 0.08);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.card-naftal::before, .card-coffee::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--coffee-700) 0%, var(--caramel-300) 100%);
+}
+.card-naftal:hover, .card-coffee:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.stat-card {
+  border-radius: 1.15rem;
+  background: var(--color-card);
+  border: 1px solid rgba(239, 229, 218, 0.9);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--coffee-700), var(--caramel-300));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.stat-card:hover::after { transform: scaleX(1); }
+/* Deux cartes par ligne sur un téléphone : moins de rembourrage, chiffres lisibles. */
+@media (max-width: 640px) {
+  .stat-card { padding: 0.875rem 1rem; gap: 0.4rem; }
+}
+
+/* ============================
+   BOUTONS
+============================ */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  background: var(--grad-coffee);
+  color: var(--caramel-200);
+  border: 1px solid rgba(212, 163, 115, 0.35);
+  box-shadow: 0 10px 20px -6px rgba(43, 27, 18, 0.35);
+  transition: all 0.2s; cursor: pointer; outline: none;
+}
+.btn-primary:hover:not(:disabled) {
+  border-color: var(--caramel-300);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 15px 26px -6px rgba(43, 27, 18, 0.45);
+}
+.btn-primary:active:not(:disabled) { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.8rem;
+  font-weight: 700; font-size: 0.8125rem;
+  background: var(--grad-caramel);
+  color: var(--coffee-900);
+  box-shadow: 0 4px 14px rgba(184, 118, 62, 0.32);
+  transition: all 0.2s; cursor: pointer; border: none; outline: none;
+}
+.btn-secondary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(184, 118, 62, 0.42); transform: translateY(-1px); }
+.btn-secondary:active:not(:disabled) { transform: scale(0.97); }
+.btn-secondary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-outline {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.8rem;
+  font-weight: 700; font-size: 0.8125rem;
+  background: transparent;
+  border: 2px solid var(--coffee-700);
+  color: var(--coffee-700);
+  transition: all 0.2s; cursor: pointer; outline: none;
+}
+.btn-outline:hover:not(:disabled) { background: var(--coffee-700); color: #fff; box-shadow: 0 4px 14px rgba(75, 54, 33, 0.25); }
+.btn-outline:active:not(:disabled) { transform: scale(0.97); }
+.btn-outline:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.8rem;
+  font-weight: 600; font-size: 0.8125rem;
+  background: transparent; color: var(--text-secondary);
+  transition: all 0.2s; cursor: pointer; border: none; outline: none;
+}
+.btn-ghost:hover:not(:disabled) { background: var(--cream-200); color: var(--coffee-700); }
+.btn-ghost:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Bouton dangereux — il ne doit JAMAIS ressembler aux autres. */
+.btn-danger {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.8rem;
+  font-weight: 700; font-size: 0.8125rem;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff; border: none; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+  transition: all 0.2s;
+}
+.btn-danger:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(220, 38, 38, 0.42); transform: translateY(-1px); }
+.btn-danger:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ============================
+   CHAMPS
+============================ */
+.input-field {
+  width: 100%; padding: 0.75rem 1rem;
+  border-radius: 0.8rem;
+  border: 1.5px solid var(--cream-400);
+  outline: none; font-size: 0.875rem; font-weight: 500;
+  background: #fff; color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(75, 54, 33, 0.04);
+  transition: all 0.2s;
+}
+.input-field::placeholder { color: var(--text-tertiary); }
+.input-field:focus {
+  border-color: var(--caramel-500);
+  box-shadow: 0 0 0 3px rgba(184, 118, 62, 0.14);
+}
+
+.label-field {
+  display: block; font-size: 0.6875rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 0.375rem; color: var(--text-secondary);
+}
+
+/* ============================
+   GRANDS FORMULAIRES — .modal-form-lg
+   Les écrans de saisie longs (achats, réceptions) sont tapés toute la journée,
+   souvent sur un téléphone au comptoir : chaque contrôle y est plus haut et le
+   texte plus grand. Appliqué par <Modal formScale> uniquement.
+============================ */
+.modal-form-lg .input-field {
+  padding: 0.8rem 1.05rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 0.9rem;
+  min-height: 3rem;
+}
+.modal-form-lg .label-field {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+  color: var(--text-secondary);
+}
+
+/* Encadré en lecture seule aligné sur un champ voisin (total de ligne, reste…). */
+.field-static {
+  display: flex; align-items: center; justify-content: flex-end;
+  width: 100%; min-height: 3rem;
+  padding: 0.8rem 1.05rem;
+  border-radius: 0.9rem;
+  border: 1.5px solid var(--cream-400);
+  background: var(--cream-100);
+  font-weight: 900; font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--coffee-700);
+}
+
+@media (max-width: 640px) {
+  /* 16px est le seuil sous lequel iOS zoome la page à la mise au point. */
+  .modal-form-lg .input-field,
+  .modal-form-lg .field-static { font-size: 1rem; min-height: 3.25rem; }
+  .modal-form-lg .modal-footer { flex-wrap: wrap; }
+  .modal-form-lg .modal-footer > button { flex: 1 1 10rem; }
+}
+
+/* ============================
+   PASTILLES
+============================ */
+.badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.6875rem; font-weight: 700; }
+.badge-success  { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.badge-warning  { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.badge-danger   { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.badge-info     { background: var(--caramel-100); color: var(--caramel-700); border: 1px solid var(--caramel-200); }
+.badge-neutral  { background: var(--cream-200); color: var(--text-secondary); border: 1px solid var(--cream-300); }
+.badge-primary  { background: rgba(111, 78, 55, 0.10); color: var(--coffee-700); border: 1px solid rgba(111, 78, 55, 0.18); }
+.badge-yellow   { background: var(--caramel-100); color: var(--caramel-700); border: 1px solid var(--caramel-200); }
+
+/* ============================
+   BARRE LATÉRALE
+============================ */
+.sidebar-link {
+  width: 100%; display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.625rem 0.875rem; border-radius: 0.8rem;
+  font-size: 0.875rem; font-weight: 500;
+  transition: all 0.18s ease; cursor: pointer; user-select: none;
+  border: none; text-align: left; position: relative; overflow: hidden;
+}
+.sidebar-link-active {
+  background: var(--grad-caramel);
+  color: var(--coffee-900); font-weight: 700;
+  box-shadow: 0 4px 14px rgba(184, 118, 62, 0.35);
+}
+.sidebar-link-inactive { color: rgba(245, 231, 216, 0.78); }
+.sidebar-link-inactive:hover { background: rgba(255, 255, 255, 0.09); color: #fff; transform: translateX(2px); }
+
+/* ============================
+   PAGE
+============================ */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+.page-title { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.02em; color: var(--coffee-800); line-height: 1.2; }
+
+/* ============================
+   TABLEAUX
+============================ */
+.table-head { font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.10em; padding: 0.875rem 1rem; text-align: left; color: var(--text-secondary); background: var(--cream-100); border-bottom: 1px solid var(--cream-300); white-space: nowrap; }
+.table-cell { padding: 0.875rem 1rem; font-size: 0.875rem; border-top: 1px solid var(--cream-200); color: var(--text-primary); transition: background 0.15s; }
+tr:hover .table-cell { background: rgba(212, 163, 115, 0.07); }
+
+/* ============================
+   FENÊTRES MODALES
+   Toutes s'ouvrent EN HAUT (jamais centrées verticalement) et passent au-dessus
+   de la barre supérieure : rien n'est jamais caché derrière elle.
+============================ */
+:root {
+  --navbar-height: 4rem;
+  --modal-top: 5rem;      /* hauteur de la barre + 1rem de respiration */
+  --modal-max-h: calc(100vh - 7rem);
+}
+
+.modal-shell {
+  position: fixed; inset: 0;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: var(--modal-top) 1rem 2rem;
+  overflow-y: auto; overscroll-behavior: contain;
+}
+@media (max-width: 640px) {
+  .modal-shell { padding: 4.5rem 0.75rem 1.5rem; }
+  :root { --modal-max-h: calc(100vh - 6rem); }
+  .modal-overlay { padding: 4.5rem 0.625rem 1.5rem; }
+  .modal-box { border-radius: 1.25rem; }
+  .modal-header { padding: 0.9rem 1rem; border-radius: 1.25rem 1.25rem 0 0; }
+  .modal-footer { padding: 0.875rem 1rem; border-radius: 0 0 1.25rem 1.25rem; }
+}
+/* Un voile dans une coquille défilante doit rester collé à la fenêtre, sinon il
+   part avec le dialogue et découvre la page. */
+.modal-shell > .absolute.inset-0 { position: fixed; }
+
+.modal-overlay {
+  position: fixed; inset: 0;
+  backdrop-filter: blur(6px);
+  z-index: 60;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: var(--modal-top) 1rem 2rem;
+  overflow-y: auto; overscroll-behavior: contain;
+  background: rgba(28, 17, 11, 0.60);
+  animation: fadeIn 0.2s ease;
+}
+/* NOTE — pas de `max-width` ici, volontairement.
+   Cette règle est HORS COUCHE alors que les utilitaires `max-w-*` de Tailwind
+   vivent dans `@layer utilities` : une règle hors couche l'emporte quel que
+   soit l'ordre du fichier. Un `max-width` ici écraserait donc TOUS les
+   `max-w-*` demandés par les dialogues. Chaque appelant déclare sa largeur
+   (voir `modalSizes` dans components/biz/Kit.tsx). */
+.modal-box {
+  border-radius: 1.5rem;
+  width: 100%;
+  max-height: var(--modal-max-h);
+  overflow-y: auto; overflow-x: hidden;
+  background: #fff;
+  border: 1px solid rgba(111, 78, 55, 0.12);
+  box-shadow: 0 32px 80px rgba(28, 17, 11, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+
+/* Entrée des dialogues qui ne sont PAS pilotés par motion. Une animation CSS
+   écrase les styles en ligne tant qu'elle tourne : la garder sur toutes les
+   .modal-box combattait la transformation de framer-motion. */
+.modal-box-anim { animation: modalDrop 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Espace de travail pleine hauteur : l'en-tête et le pied restent en place,
+   seul le corps défile. Déclaré après .modal-box pour gagner sur elle. */
+.modal-box-full {
+  height: var(--modal-max-h);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.modal-box-full > .modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto; overflow-x: hidden;
+  min-height: 0;
+}
+.modal-box-full > .modal-header,
+.modal-box-full > .modal-footer { flex-shrink: 0; }
+
+@keyframes modalDrop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: none; } }
+
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1.125rem 1.5rem;
+  position: sticky; top: 0; z-index: 10;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: var(--grad-coffee);
+  border-bottom: 2px solid rgba(212, 163, 115, 0.6);
+  color: #fff;
+}
+.modal-header h3, .modal-header .modal-title { color: #fff; }
+.modal-header .modal-subtitle { color: rgba(245, 231, 216, 0.78); }
+.modal-title-icon {
+  width: 2.25rem; height: 2.25rem; border-radius: 0.75rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  background: var(--grad-caramel);
+  color: var(--coffee-900);
+  box-shadow: 0 4px 14px rgba(184, 118, 62, 0.4);
+}
+.modal-close {
+  padding: 0.4rem; border-radius: 0.65rem; color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.13);
+  transition: all 0.18s; cursor: pointer;
+}
+.modal-close:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
+.modal-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  position: sticky; bottom: 0;
+  background: linear-gradient(180deg, rgba(250, 246, 241, 0.85), var(--cream-100));
+  border-top: 1px solid var(--cream-300);
+  border-radius: 0 0 1.5rem 1.5rem;
+}
+
+/* ============================
+   DIVERS
+============================ */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(111, 78, 55, 0.18); border-radius: 999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(111, 78, 55, 0.34); }
+
+.hover-lift { transition: all 0.25s ease; }
+.hover-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+.naftal-accent, .coffee-accent { background: var(--grad-coffee); }
+
+.text-gradient-naftal, .text-gradient-coffee {
+  background: linear-gradient(135deg, var(--coffee-700), var(--caramel-500));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.divider-naftal, .divider-coffee {
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--coffee-700), var(--caramel-300), transparent);
+  border-radius: 1px; opacity: 0.55;
+}
+
+.tab-bar { display: flex; gap: 0.25rem; background: var(--cream-200); border-radius: 0.9rem; padding: 0.25rem; }
+.tab-item { padding: 0.5rem 1rem; border-radius: 0.65rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; color: var(--text-secondary); border: none; background: transparent; white-space: nowrap; }
+.tab-item-active { background: #fff; color: var(--coffee-700); box-shadow: 0 2px 8px rgba(75, 54, 33, 0.12); font-weight: 700; }
+.tab-item:hover:not(.tab-item-active) { color: var(--coffee-700); }
+
+.card-hover { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease; }
+.card-hover:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 12px 40px rgba(75, 54, 33, 0.16); }
+
+.btn-primary, .btn-secondary { transition: transform 0.1s ease, box-shadow 0.1s ease; }
+.btn-primary:active, .btn-secondary:active { transform: scale(0.97); }
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.95); opacity: 1; }
+  100% { transform: scale(1.8);  opacity: 0; }
+}
+.pulse-ring { animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+/* Le liseré coloré d'une cafétéria — chaque partie a sa teinte, posée en
+   variable par le composant : `style={{ '--caf-color': cfg.color }}`. */
+.caf-tint { border-left: 4px solid var(--caf-color, var(--caramel-300)); }
+.caf-dot  { width: 0.6rem; height: 0.6rem; border-radius: 999px; background: var(--caf-color, var(--caramel-300)); flex-shrink: 0; }
+
+/* Raccourci clavier affiché dans l'interface. */
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.4rem; padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+  font-size: 0.65rem; font-weight: 700; font-family: ui-monospace, monospace;
+  background: var(--cream-200); color: var(--text-secondary);
+  border: 1px solid var(--cream-400); border-bottom-width: 2px;
+}
+
+/* ============================
+   IMPRESSION
+============================ */
+@media print {
+  /* Imprimer les fonds fidèlement (en-têtes, pastilles, cadres). */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body { background: #fff !important; }
+  .page-break { page-break-after: always; }
+
+  /* Ticket thermique par défaut (caisse) */
+  @page { margin: 10mm; size: 80mm auto; }
+  /* Page A4 nommée, utilisée par les documents pleine page */
+  @page a4doc { size: A4 portrait; margin: 10mm; }
+
+  /* ════════ TICKET THERMIQUE (défaut) ════════ */
+  body:not(.print-document) * { visibility: hidden !important; }
+  body:not(.print-document) #print-invoice-zone,
+  body:not(.print-document) #print-invoice-zone * { visibility: visible !important; }
+  body:not(.print-document) #print-invoice-zone {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 99999 !important;
+    background: #fff !important;
+    padding: 24px !important;
+    font-family: 'Courier New', monospace !important;
+  }
+  body:not(.print-document) .no-print,
+  body:not(.print-document) button,
+  body:not(.print-document) nav,
+  body:not(.print-document) .sidebar,
+  body:not(.print-document) .navbar { display: none !important; }
+
+  /* ════════ DOCUMENT A4 ════════
+     Déclenché par `printDocumentMode()`, qui pose `.print-document` sur <body>. */
+  body.print-document > * { display: none !important; }
+  body.print-document > #report-print-portal,
+  body.print-document > #document-print-root {
+    display: block !important;
+    visibility: visible !important;
+    page: a4doc;
+  }
+  body.print-document #report-print-portal *,
+  body.print-document #document-print-root * { visibility: visible !important; }
+  body.print-document .print-hidden,
+  body.print-document .no-print { display: none !important; }
+}
